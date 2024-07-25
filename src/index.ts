@@ -72,13 +72,13 @@ if (lastCommand) {
 	console.log(`No command recorded for directory: ${currentDir}`)
 }
 
-function exitCommand(code: string) {
-    if (!code) {
+function exitCommand(codeStr: string) {
+    if (!codeStr) {
         console.error(`Command must be specified`)
         process.exit(1)
     }
 
-    const child = spawn(command, {
+    const child = spawn(codeStr, {
         shell: true,
         stdio: 'inherit',
     })
