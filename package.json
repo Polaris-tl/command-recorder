@@ -7,6 +7,10 @@
 		"build": "npx tsc"
 	},
 	"author": "polaris",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Polaris-tl/command-recorder.git"
+	},
 	"license": "MIT",
 	"bin": {
 		"fuck": "./dist/index.js"
