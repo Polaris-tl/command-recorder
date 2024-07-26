@@ -59,8 +59,10 @@ if (command && currentDir) {
 	if (immediately) {
 		console.log(`Executing`)
 		exitCommand(command)
-	}
-	process.exit(0)
+	} else {
+        console.log(`Done`)
+	    process.exit(0)
+    }
 }
 
 // 执行上次的命令
