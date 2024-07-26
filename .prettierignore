@@ -1,0 +1,6 @@
+dist/
+node_modules/
+.gitignore
+.npmignore
+.prettierignore
+.DS_Store
