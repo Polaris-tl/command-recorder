@@ -3,10 +3,16 @@
 import { Command } from 'commander'
 import { spawn } from 'child_process'
 import DataStorage from './dataStorage'
+import { readFileSync } from 'fs'
+import { join } from 'path'
+
+const packageJsonPath = join(__dirname, 'package.json')
+const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'))
+const version = packageJson.version
 
 const program = new Command()
 program
-  .version('1.0.0')
+  .version(version)
   .description('Record the command executed in a specific directory, so that the next time you enter that directory, you can simply type "fuck" to execute the previous command')
   .option('-c, --command <value>', 'the command you want to record')
   .option('-d, --dir <value>', 'the directory you want to record the command, default is current directory', process.cwd())
@@ -20,12 +26,6 @@ const options = program.opts()
 const command = options.command
 const currentDir = options.dir
 const immediately = options.immediately
-
-// 输出版本号
-if (options.version) {
-  console.log('1.0.0')
-  process.exit(0)
-}
 
 // 列出所有记录的目录
 if (options.list) {
@@ -46,7 +46,7 @@ if (options.remove) {
 }
 
 // 设置命令记录
-if (command && currentDir) {
+if (command) {
   store.setItem(currentDir, command)
   console.log(`Recorded command "${command}" for directory: ${currentDir}`)
 
@@ -55,17 +55,17 @@ if (command && currentDir) {
     exitCommand(command)
   } else {
     console.log('Done')
+  }
+} else {
+  // 执行上次的命令
+  const lastCommand = store.getItem(currentDir)
+  if (lastCommand) {
+    console.log(`Executing last command "${lastCommand}" for directory: ${currentDir}`)
+    exitCommand(lastCommand)
+  } else {
+    console.log(`No command recorded for directory: ${currentDir}`)
     process.exit(0)
   }
-}
-
-// 执行上次的命令
-const lastCommand = store.getItem(currentDir)
-if (lastCommand) {
-  console.log(`Executing last command "${lastCommand}" for directory: ${currentDir}`)
-  exitCommand(lastCommand)
-} else {
-  console.log(`No command recorded for directory: ${currentDir}`)
 }
 
 function exitCommand(codeStr: string) {
@@ -81,18 +81,13 @@ function exitCommand(codeStr: string) {
 
   child.on('error', (error) => {
     console.error(`Error executing command: ${error.message}`)
+    process.exit(1)
   })
 
   child.on('close', (code) => {
     if (code !== 0) {
       console.error(`Command failed with code ${code}`)
     }
-    process.exit(code)
-  })
-  child.on('exit', (code) => {
-    if (code !== 0) {
-      console.error(`Command failed with code ${code}`)
-    }
-    process.exit(code)
+    process.exit(code || 0) // Exit with the child process exit code, or 0 if it's null/undefined
   })
 }
