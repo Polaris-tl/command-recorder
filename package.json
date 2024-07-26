@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
+    "publish": "npx tsc && npm publish",
     "lint-staged": "lint-staged",
     "lint": "eslint . --ext .js,.ts --fix",
     "format": "prettier --write \"./**/*.{html,ts,js,json,md}\"",
