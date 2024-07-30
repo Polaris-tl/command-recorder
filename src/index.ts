@@ -3,16 +3,11 @@
 import { Command } from 'commander'
 import { spawn } from 'child_process'
 import DataStorage from './dataStorage'
-import { readFileSync } from 'fs'
-import { join } from 'path'
-
-const packageJsonPath = join(__dirname, 'package.json')
-const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'))
-const version = packageJson.version
 
 const program = new Command()
+
 program
-  .version(version)
+  .version('__VERSION__')
   .description('Record the command executed in a specific directory, so that the next time you enter that directory, you can simply type "fuck" to execute the previous command')
   .option('-c, --command <value>', 'the command you want to record')
   .option('-d, --dir <value>', 'the directory you want to record the command, default is current directory', process.cwd())
