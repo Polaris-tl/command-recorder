@@ -74,10 +74,15 @@ class DataStorage {
   }
 
   // 列出所有记录的目录
-  listItems(): string[] {
+  listItems(): { key: string; value: any }[] {
     const data = this.readData()
     const list = Object.keys(data || {})
-    return data ? list.map((key) => `${key}: ${data[key]}`) : []
+    return data
+      ? list.map((key) => ({
+          key,
+          value: data[key]
+        }))
+      : []
   }
 }
 

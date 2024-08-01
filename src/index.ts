@@ -6,6 +6,16 @@ import DataStorage from './dataStorage'
 
 const program = new Command()
 
+const COLORS = {
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m'
+}
+function colorLog(message: string, color: keyof typeof COLORS) {
+  console.log(`${COLORS[color]}%s${COLORS.reset}`, message)
+}
+
 program
   .version('__VERSION__')
   .description('Record the command executed in a specific directory, so that the next time you enter that directory, you can simply type "fuck" to execute the previous command')
@@ -14,6 +24,7 @@ program
   .option('-l, --list', 'list all the directories you have recorded')
   .option('-r, --remove <value>', 'remove a specific directory, <current> will remove the current directorys command')
   .option('-i, --immediately <value>', 'execute the command immediately, default is true', true)
+  .option('--current', 'show the current directory command')
   .parse(process.argv)
 
 const store = new DataStorage('fuck')
@@ -23,9 +34,22 @@ const currentDir = options.dir
 const immediately = options.immediately
 
 // 列出所有记录的目录
+if (options.current) {
+  const command = store.getItem(currentDir)
+  colorLog(`${command}`, 'green')
+  process.exit(0)
+}
+
+// 列出所有记录的目录
 if (options.list) {
   const dirs = store.listItems()
-  console.log('Recorded directories: ', dirs)
+  dirs.forEach(({ key, value }, index) => {
+    if (key === currentDir) {
+      colorLog(`${index + 1}、✅ ${key} : ${value}`, 'green')
+    } else {
+      colorLog(`${index + 1}、${key} : ${value}`, 'yellow')
+    }
+  })
   process.exit(0)
 }
 
@@ -36,36 +60,34 @@ if (options.remove) {
     dir = currentDir
   }
   store.removeItem(dir)
-  console.log('Removed command for directory: ', dir)
+  colorLog('Removed command for directory: ' + dir, 'red')
   process.exit(0)
 }
 
 // 设置命令记录
 if (command) {
   store.setItem(currentDir, command)
-  console.log(`Recorded command "${command}" for directory: ${currentDir}`)
+  colorLog(`Recorded command "${command}" for directory: ${currentDir}`, 'green')
 
   if (immediately) {
-    console.log('Executing')
+    colorLog('Executing...', 'green')
     exitCommand(command)
-  } else {
-    console.log('Done')
   }
 } else {
   // 执行上次的命令
   const lastCommand = store.getItem(currentDir)
   if (lastCommand) {
-    console.log(`Executing last command "${lastCommand}" for directory: ${currentDir}`)
+    colorLog(`Executing last command "${lastCommand}" for directory: ${currentDir}`, 'green')
     exitCommand(lastCommand)
   } else {
-    console.log(`No command recorded for directory: ${currentDir}`)
+    colorLog(`No command recorded for directory: ${currentDir}`, 'yellow')
     process.exit(0)
   }
 }
 
 function exitCommand(codeStr: string) {
   if (!codeStr) {
-    console.error('Command must be specified')
+    colorLog('Command must be specified', 'red')
     process.exit(1)
   }
 
@@ -75,7 +97,7 @@ function exitCommand(codeStr: string) {
   })
 
   child.on('error', (error) => {
-    console.error(`Error executing command: ${error.message}`)
+    colorLog(`Error executing command: ${error.message}`, 'red')
     process.exit(1)
   })
 
