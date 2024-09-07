@@ -34,7 +34,7 @@ const currentDir = options.dir
 const immediately = options.immediately
 
 // 列出所有记录的目录
-if (options.current) {
+if (process.argv.includes('--current')) {
   const command = store.getItem(currentDir)
   colorLog(`${command}`, 'green')
   process.exit(0)
