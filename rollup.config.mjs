@@ -5,6 +5,7 @@ import typescript from '@rollup/plugin-typescript'
 import commonjs from '@rollup/plugin-commonjs'
 import babel from '@rollup/plugin-babel'
 import { readFileSync } from 'fs'
+import json from '@rollup/plugin-json'
 import replace from '@rollup/plugin-replace'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'))
@@ -12,6 +13,7 @@ const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'))
 export default defineConfig({
   input: './src/index.ts',
   plugins: [
+    json(),
     typescript(),
     commonjs(),
     resolve({

@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
+import 'core-js/actual/array/find-last-index'
 import { Command } from 'commander'
 import { spawn } from 'child_process'
+import fs from 'fs'
+import inquirer from 'inquirer'
 import DataStorage from './dataStorage'
 
 const program = new Command()
@@ -20,10 +23,9 @@ program
   .version('__VERSION__')
   .description('Record the command executed in a specific directory, so that the next time you enter that directory, you can simply type "fuck" to execute the previous command')
   .option('-c, --command <value>', 'the command you want to record')
-  .option('-d, --dir <value>', 'the directory you want to record the command, default is current directory', process.cwd())
   .option('-l, --list', 'list all the directories you have recorded')
-  .option('-r, --remove <value>', 'remove a specific directory, <current> will remove the current directorys command')
-  .option('-i, --immediately <value>', 'execute the command immediately, default is true', true)
+  .option('-r, --remove [value]', 'remove a specific directory, <current> will remove the current directorys command')
+  .option('-i, --immediately [value]', 'execute the command immediately, default is true', true)
   .option('--current', 'show the current directory command')
   .parse(process.argv)
 
@@ -55,9 +57,10 @@ if (options.list) {
 
 // 删除特定目录的命令
 if (options.remove) {
-  let dir = options.remove
-  if (options.remove === 'current') {
-    dir = currentDir
+  const dir = options.remove
+  if (!dir) {
+    colorLog('Directory must be specified', 'red')
+    process.exit(1)
   }
   store.removeItem(dir)
   colorLog('Removed command for directory: ' + dir, 'red')
@@ -76,12 +79,49 @@ if (command) {
 } else {
   // 执行上次的命令
   const lastCommand = store.getItem(currentDir)
-  if (lastCommand) {
-    colorLog(`Executing last command "${lastCommand}" for directory: ${currentDir}`, 'green')
-    exitCommand(lastCommand)
+  if (!lastCommand) {
+    let packageJson: any = {}
+    try {
+      packageJson = JSON.parse(fs.readFileSync(process.cwd() + '/package.json', 'utf8'))
+    } catch (error) {
+      colorLog('package.json not found', 'yellow')
+      process.exit(0)
+    }
+    const scripts = packageJson.scripts || {}
+    const scriptNames = Object.keys(scripts)
+    if (scriptNames.length === 0) {
+      colorLog('没有可用的命令', 'yellow')
+      process.exit(0)
+    }
+    const questions: any[] = [
+      {
+        type: 'list',
+        name: 'selectedCommand',
+        message: '请选择一个命令:',
+        choices: scriptNames.map((i) => {
+          return { name: `${i} ==> ${scripts[i]}`, value: i }
+        })
+      }
+    ]
+    inquirer
+      .prompt(questions)
+      .then((answers) => {
+        console.log(answers)
+        const selectedCommand = scripts[answers.selectedCommand]
+        const dir = process.cwd()
+        store.setItem(dir, selectedCommand)
+        colorLog(`记录命令 "${selectedCommand}" 为目录: ${dir}`, 'green')
+        if (immediately) {
+          exitCommand(selectedCommand)
+        }
+      })
+      .catch((error) => {
+        console.error('执行失败:', error)
+        process.exit(1)
+      })
   } else {
-    colorLog(`No command recorded for directory: ${currentDir}`, 'yellow')
-    process.exit(0)
+    colorLog(`执行上次的命令 "${lastCommand}" 为目录: ${currentDir}`, 'green')
+    exitCommand(lastCommand)
   }
 }
 

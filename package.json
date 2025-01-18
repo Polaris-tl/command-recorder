@@ -1,6 +1,6 @@
 {
   "name": "command-recorder",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -36,13 +36,16 @@
   },
   "dependencies": {
     "appdata-path": "^1.0.0",
-    "commander": "^12.1.0"
+    "commander": "^12.1.0",
+    "core-js": "^3.40.0",
+    "inquirer": "^12.3.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
     "@commitlint/config-conventional": "^19.1.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-replace": "^5.0.7",
     "@rollup/plugin-terser": "^0.4.4",
