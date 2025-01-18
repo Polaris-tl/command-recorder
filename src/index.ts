@@ -2,6 +2,7 @@
 
 import 'core-js/actual/array/find-last-index'
 import { Command } from 'commander'
+import path from 'path'
 import { spawn } from 'child_process'
 import fs from 'fs'
 import inquirer from 'inquirer'
@@ -32,7 +33,7 @@ program
 const store = new DataStorage('fuck')
 const options = program.opts()
 const command = options.command
-const currentDir = options.dir
+const currentDir = process.cwd()
 const immediately = options.immediately
 
 // 列出所有记录的目录
@@ -131,9 +132,15 @@ function exitCommand(codeStr: string) {
     process.exit(1)
   }
 
+  // 获取 node_modules/.bin 路径
+  const binPath = path.resolve(process.cwd(), 'node_modules/.bin')
   const child = spawn(codeStr, {
     shell: true,
-    stdio: 'inherit'
+    stdio: 'inherit',
+    env: {
+      ...process.env,
+      PATH: `${binPath}:${process.env.PATH}` // 将 node_modules/.bin 添加到 PATH
+    }
   })
 
   child.on('error', (error) => {
