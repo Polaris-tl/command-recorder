@@ -1,53 +1,61 @@
 # Command Recorder
 
-Command Recorder 是一个命令行工具，用于记录在特定目录下执行的命令。下次进入该目录时，只需输入一个简单的命令即可执行上次记录的命令。
-
-## 描述
-
-Command Recorder 允许你记录在特定目录下执行的命令。下次进入该目录时，你可以简单地输入 fuck 来执行上次记录的命令
+`command-recorder` 是一个按目录记录命令的 CLI 工具。  
+在某个目录记录一次命令后，下次进入该目录只需输入 `fuck` 就能直接执行上次命令。
 
 ## 安装
 
-确保你已经安装了 Node.js 和 npm。然后在项目目录下运行以下命令来安装依赖：
-`npm install command-recorder`
+推荐全局安装（可在任意目录直接使用 `fuck`）：
 
-## 使用方法
+```bash
+npm install -g command-recorder
+```
 
-### 版本
+如果你只想在当前项目里使用：
 
-`fuck -v`
+```bash
+npm install --save-dev command-recorder
+npx fuck -V
+```
 
-### 记录命令
+## 常见用法
 
-记录在指定目录下执行的命令：
-`fuck -c "<your-command>"`
-示例
-`fuck -c "ls -la"`
+```bash
+# 查看版本
+fuck -v
 
-### 删除特定目录的命令
+# 记录命令（默认会立即执行）
+fuck -c "npm run dev"
 
-`fuck -r "<path/to/your/dir>"`
+# 仅记录，不立即执行
+fuck -c "npm run dev" -i false
 
-### 删除当前目录的命令记录
+# 执行当前目录上次记录的命令
+fuck
 
-`fuck --remove "current"`
+# 查看当前目录记录的命令
+fuck --current
 
-### 立即执行命令
+# 查看所有目录记录
+fuck --list
 
-你可以选择在记录命令时立即执行它。默认情况下，该选项是启用的：
-`fuck -c "<your-command>" -i "true"`
-如果你不希望立即执行命令，可以将 --immediately 选项设置为 false：
-`fuck -c "<your-command>" -i "false"`
+# 删除当前目录记录
+fuck --remove current
 
-## 选项
+# 删除指定目录记录
+fuck --remove "/path/to/project"
+```
 
-- -V, --version ：输出版本号。
-- -c, --command \<value>：你想要记录的命令。
-- -d, --dir \<value>：你想要记录命令的目录，默认为当前目录。
-- -l, --list：列出所有你已经记录过命令的目录。
-- -r, --remove \<value>：删除特定目录的命令记录，current 将删除当前目录的命令记录。
-- -i, --immediately \<value>：立即执行命令，默认为 true。
+## 参数说明
+
+- `-v, --version`：输出版本号
+- `-c, --command <value>`：记录命令
+- `-l, --list`：列出所有记录
+- `--current`：显示当前目录记录的命令
+- `-r, --remove [value]`：删除记录，支持 `current` 或指定目录路径
+- `-i, --immediately [value]`：是否立即执行，支持 `true/false`，默认 `true`
 
 ## 注意事项
 
-确保你在使用该工具时具有相应目录的读写权限。
+- 请确保你对目标目录和用户配置目录有读写权限。
+- 该工具会执行你记录的原始命令，请只记录可信命令。

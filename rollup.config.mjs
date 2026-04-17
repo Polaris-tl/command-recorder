@@ -1,25 +1,20 @@
 import { defineConfig } from 'rollup'
-import resolve from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
-import commonjs from '@rollup/plugin-commonjs'
-import babel from '@rollup/plugin-babel'
 import { readFileSync } from 'fs'
-import json from '@rollup/plugin-json'
 import replace from '@rollup/plugin-replace'
+import { builtinModules } from 'module'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'))
+const dependencies = Object.keys(packageJson.dependencies || {})
+const peerDependencies = Object.keys(packageJson.peerDependencies || {})
+const builtins = [...builtinModules, ...builtinModules.map((name) => `node:${name}`)]
 
 export default defineConfig({
   input: './src/index.ts',
+  external: [...dependencies, ...peerDependencies, ...builtins],
   plugins: [
-    json(),
     typescript(),
-    commonjs(),
-    resolve({
-      extensions: ['.js', '.ts']
-    }),
-    babel({ babelHelpers: 'bundled' }),
     replace({
       preventAssignment: true,
       values: {
