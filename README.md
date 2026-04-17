@@ -54,7 +54,9 @@ fuck --alias dev -c "npm run dev"
 # 查看当前目录所有别名
 fuck --aliases
 
-# 通过别名运行命令
+# 通过别名运行命令（支持 -r 快捷方式）
+fuck dev
+fuck -r dev
 fuck --run dev
 
 # 删除当前目录记录
@@ -67,15 +69,16 @@ fuck --remove "/path/to/project"
 ## 参数说明
 
 - `-v, --version`：输出版本号
+- `<name>`：直接按别名运行（等价于 `-r <name>`）
 - `-c, --command <value>`：记录命令
 - `--alias <name>`：为当前目录命令设置别名（配合 `--command` 使用）
 - `--aliases`：列出当前目录所有别名
-- `--run <name>`：运行当前目录下指定别名的命令
+- `-r, --run <name>`：运行当前目录下指定别名的命令
 - `-l, --list`：列出所有记录
 - `--history [value]`：查看当前目录历史命令，默认显示最近 10 条
 - `--pick`：交互式选择当前目录历史命令并执行
 - `--current`：显示当前目录记录的命令
-- `-r, --remove [value]`：删除记录，支持 `current` 或指定目录路径
+- `--remove [value]`：删除记录，支持 `current` 或指定目录路径
 - `-i, --immediately [value]`：是否立即执行，支持 `true/false`，默认 `true`
 
 ## 注意事项

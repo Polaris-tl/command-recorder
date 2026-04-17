@@ -80,7 +80,7 @@ test('shows history with limit from newest to oldest', () => {
   }
 })
 
-test('supports alias save, list, and run', () => {
+test('supports alias save, list, and run with short and positional forms', () => {
   const sandbox = createSandbox()
   try {
     const aliasResult = runCli(['--alias', 'dev', '-c', 'echo aliased', '-i', 'false'], sandbox)
@@ -91,9 +91,13 @@ test('supports alias save, list, and run', () => {
     assert.equal(aliasesResult.status, 0)
     assert.match(aliasesResult.stdout, /dev => echo aliased/)
 
-    const runResult = runCli(['--run', 'dev', '-i', 'false'], sandbox)
+    const runResult = runCli(['-r', 'dev', '-i', 'false'], sandbox)
     assert.equal(runResult.status, 0)
     assert.match(runResult.stdout, /Running alias "dev" => "echo aliased"/)
+
+    const positionalRunResult = runCli(['dev', '-i', 'false'], sandbox)
+    assert.equal(positionalRunResult.status, 0)
+    assert.match(positionalRunResult.stdout, /Running alias "dev" => "echo aliased"/)
   } finally {
     sandbox.cleanup()
   }

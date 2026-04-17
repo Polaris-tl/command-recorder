@@ -106,14 +106,15 @@ function resolvePrompt(): PromptFunction {
 program
   .version('__VERSION__', '-v, --version')
   .description('Record the command executed in a specific directory, so that the next time you enter that directory, you can simply type "fuck" to execute the previous command')
+  .argument('[name]', 'run alias name directly (same as -r, --run)')
   .option('-c, --command <value>', 'the command you want to record')
   .option('--alias <name>', 'save an alias for the command in current directory, use with --command')
   .option('--aliases', 'list all aliases in current directory')
-  .option('--run <name>', 'run a command by alias name in current directory')
+  .option('-r, --run <name>', 'run a command by alias name in current directory')
   .option('-l, --list', 'list all the directories you have recorded')
   .option('--history [value]', 'show command history for current directory, default: 10')
   .option('--pick', 'pick and run one command from current directory history')
-  .option('-r, --remove [value]', 'remove command for a directory, use "current" to remove the current directory command')
+  .option('--remove [value]', 'remove command for a directory, use "current" to remove the current directory command')
   .option('-i, --immediately [value]', 'execute the command immediately, default is true', true)
   .option('--current', 'show the current directory command')
   .parse(process.argv)
@@ -133,6 +134,8 @@ const options = program.opts<{
 }>()
 const currentDir = process.cwd()
 const command = options.command
+const positionalAliasName = typeof program.args[0] === 'string' ? program.args[0].trim() : ''
+const runAliasName = options.run?.trim() || positionalAliasName
 
 let immediately = true
 try {
@@ -236,16 +239,10 @@ if (options.history !== undefined) {
     colorLog(`${index + 1}. ${alias.name} => ${alias.command}`, color)
   })
   process.exit(0)
-} else if (options.run) {
-  const aliasName = options.run.trim()
-  if (!aliasName) {
-    colorLog('Alias name must not be empty.', 'red')
-    process.exit(1)
-  }
-
-  const aliasedCommand = store.getAlias(currentDir, aliasName)
+} else if (runAliasName) {
+  const aliasedCommand = store.getAlias(currentDir, runAliasName)
   if (!aliasedCommand) {
-    colorLog(`Alias "${aliasName}" not found in current directory.`, 'red')
+    colorLog(`Alias "${runAliasName}" not found in current directory.`, 'red')
     const aliases = store.listAliases(currentDir)
     if (aliases.length > 0) {
       colorLog('Available aliases:', 'yellow')
@@ -257,7 +254,7 @@ if (options.history !== undefined) {
   }
 
   store.setItem(currentDir, aliasedCommand)
-  colorLog(`Running alias "${aliasName}" => "${aliasedCommand}"`, 'green')
+  colorLog(`Running alias "${runAliasName}" => "${aliasedCommand}"`, 'green')
   if (immediately) {
     exitCommand(aliasedCommand)
   }

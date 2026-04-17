@@ -1,6 +1,6 @@
 {
   "name": "command-recorder",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Record and replay shell commands by directory with a single CLI command.",
   "main": "dist/index.js",
   "scripts": {
