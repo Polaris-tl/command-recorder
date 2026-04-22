@@ -1,0 +1,38 @@
+diff --git a/node_modules/@inquirer/select/dist/commonjs/index.js b/node_modules/@inquirer/select/dist/commonjs/index.js
+index 2fc2ebf..2e75a5f 100644
+--- a/node_modules/@inquirer/select/dist/commonjs/index.js
++++ b/node_modules/@inquirer/select/dist/commonjs/index.js
+@@ -51,7 +51,13 @@ exports.default = (0, core_1.createPrompt)((config, done) => {
+     const items = (0, core_1.useMemo)(() => normalizeChoices(config.choices), [config.choices]);
+     const bounds = (0, core_1.useMemo)(() => {
+         const first = items.findIndex(isSelectable);
+-        const last = items.findLastIndex(isSelectable);
++        let last = -1;
++        for (let index = items.length - 1; index >= 0; index -= 1) {
++            if (isSelectable(items[index])) {
++                last = index;
++                break;
++            }
++        }
+         if (first === -1) {
+             throw new core_1.ValidationError('[select prompt] No selectable choices. All choices are disabled.');
+         }
+diff --git a/node_modules/@inquirer/select/dist/esm/index.js b/node_modules/@inquirer/select/dist/esm/index.js
+index b9e382d..28eec7e 100644
+--- a/node_modules/@inquirer/select/dist/esm/index.js
++++ b/node_modules/@inquirer/select/dist/esm/index.js
+@@ -45,7 +45,13 @@ export default createPrompt((config, done) => {
+     const items = useMemo(() => normalizeChoices(config.choices), [config.choices]);
+     const bounds = useMemo(() => {
+         const first = items.findIndex(isSelectable);
+-        const last = items.findLastIndex(isSelectable);
++        let last = -1;
++        for (let index = items.length - 1; index >= 0; index -= 1) {
++            if (isSelectable(items[index])) {
++                last = index;
++                break;
++            }
++        }
+         if (first === -1) {
+             throw new ValidationError('[select prompt] No selectable choices. All choices are disabled.');
+         }
