@@ -1,6 +1,6 @@
 {
   "name": "command-recorder",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "Record and replay shell commands by directory with a single CLI command.",
   "main": "dist/index.js",
   "scripts": {
@@ -31,7 +31,8 @@
     ]
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "patches/**/*"
   ],
   "repository": {
     "type": "git",
@@ -42,12 +43,13 @@
     "fuck": "./dist/index.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=16"
   },
   "dependencies": {
     "appdata-path": "^1.0.0",
     "commander": "^12.1.0",
-    "inquirer": "^12.3.2"
+    "inquirer": "^12.3.2",
+    "patch-package": "^8.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
@@ -62,7 +64,6 @@
     "eslint-plugin-prettier": "^5.1.3",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
-    "patch-package": "^8.0.1",
     "prettier": "^3.2.5",
     "rollup": "^4.13.1",
     "typescript": "^5.5.4"
